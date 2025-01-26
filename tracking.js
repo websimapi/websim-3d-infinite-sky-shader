@@ -7,8 +7,9 @@ const ctx = poseCanvas.getContext('2d');
 // Initialize pose detection
 async function initPoseDetection() {
   const detectorConfig = {
-    modelType: poseDetection.movenet.modelType.SINGLEPOSE_LIGHTNING,
-    enableSmoothing: true
+    modelType: poseDetection.movenet.modelType.SINGLEPOSE_THUNDER, 
+    enableSmoothing: true,
+    multiPoseMaxDimension: 256
   };
   detector = await poseDetection.createDetector(
     poseDetection.SupportedModels.MoveNet,
@@ -19,7 +20,11 @@ async function initPoseDetection() {
 // Setup webcam
 async function setupCamera() {
   const stream = await navigator.mediaDevices.getUserMedia({
-    video: { width: 240, height: 180 },
+    video: {
+      width: 640,  
+      height: 480,
+      facingMode: 'user'
+    },
     audio: false
   });
   video.srcObject = stream;
@@ -42,14 +47,18 @@ function drawPose(pose) {
   pose.keypoints.forEach(keypoint => {
     if (keypoint.score > 0.3) {
       ctx.beginPath();
-      ctx.arc(keypoint.x, keypoint.y, 4, 0, 2 * Math.PI);
+      ctx.arc(keypoint.x, keypoint.y, 6, 0, 2 * Math.PI);
       ctx.fillStyle = 'aqua';
       ctx.fill();
+      ctx.strokeStyle = 'white';
+      ctx.lineWidth = 2;
+      ctx.stroke();
     }
   });
   
   // Draw skeleton
   const connections = poseDetection.util.getAdjacentPairs(poseDetection.SupportedModels.MoveNet);
+  ctx.lineWidth = 4;
   connections.forEach(([i, j]) => {
     const kp1 = pose.keypoints[i];
     const kp2 = pose.keypoints[j];
@@ -59,7 +68,11 @@ function drawPose(pose) {
       ctx.moveTo(kp1.x, kp1.y);
       ctx.lineTo(kp2.x, kp2.y);
       ctx.strokeStyle = 'aqua';
-      ctx.lineWidth = 2;
+      ctx.stroke();
+      
+      // Add white outline
+      ctx.lineWidth = 6;
+      ctx.strokeStyle = 'rgba(255,255,255,0.5)';
       ctx.stroke();
     }
   });
@@ -68,14 +81,21 @@ function drawPose(pose) {
 // Main detection loop
 async function detectPose() {
   if (detector && video.readyState === 4) {
-    poses = await detector.estimatePoses(video);
-    
-    if (poses.length > 0) {
-      drawPose(poses[0]);
-      // Emit pose data for the main scene
-      window.dispatchEvent(new CustomEvent('poseUpdated', {
-        detail: poses[0]
-      }));
+    try {
+      poses = await detector.estimatePoses(video, {
+        maxPoses: 1,
+        flipHorizontal: false
+      });
+      
+      if (poses.length > 0) {
+        drawPose(poses[0]);
+        // Emit pose data for the main scene
+        window.dispatchEvent(new CustomEvent('poseUpdated', {
+          detail: poses[0]
+        }));
+      }
+    } catch (error) {
+      console.error('Error in pose detection:', error);
     }
   }
   requestAnimationFrame(detectPose);
@@ -83,9 +103,13 @@ async function detectPose() {
 
 // Initialize everything
 async function init() {
-  await setupCamera();
-  await initPoseDetection();
-  detectPose();
+  try {
+    await setupCamera();
+    await initPoseDetection();
+    detectPose();
+  } catch (error) {
+    console.error('Error initializing:', error);
+  }
 }
 
 init();
