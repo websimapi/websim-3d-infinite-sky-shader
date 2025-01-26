@@ -6,7 +6,6 @@
       margin: 0;
       overflow: hidden;
       display: flex;
-      flex-direction: column;
       justify-content: center;
       align-items: center;
       width: 100vw;
@@ -15,20 +14,10 @@
     }
     .container {
       position: relative;
-      width: min(100%, 100vh);
-      height: min(100%, 100vw);
-      aspect-ratio: 1/1;
-      transition: all 0.3s ease;
-    }
-    .container.widescreen {
-      width: min(100%, 177.78vh); /* 16:9 ratio */
-      height: min(100%, 56.25vw); /* 16:9 ratio */
-      aspect-ratio: 16/9;
-    }
-    .container.fullscreen {
-      width: 100vw;
-      height: 100vh;
-      aspect-ratio: unset;
+      width: 100%;
+      height: 100%;
+      max-width: 177.78vh; /* 16:9 aspect ratio */
+      max-height: 100vh;
     }
     canvas {
       width: 100%;
@@ -49,11 +38,11 @@
     }
     .controls {
       position: fixed;
-      top: 20px;
+      bottom: 20px;
       right: 20px;
+      z-index: 2;
       display: flex;
       gap: 10px;
-      z-index: 2;
     }
     button {
       background: rgba(255, 255, 255, 0.2);
@@ -63,27 +52,29 @@
       cursor: pointer;
       border-radius: 4px;
       font-family: Arial, sans-serif;
-      transition: background 0.3s ease;
+      transition: background 0.3s;
     }
     button:hover {
       background: rgba(255, 255, 255, 0.3);
     }
-    button.active {
+    .aspect-ratio-button.active {
       background: rgba(255, 255, 255, 0.4);
     }
   </style>
 </head>
 <body>
-  <div class="controls">
-    <button id="squareBtn" class="active">Square</button>
-    <button id="wideBtn">Widescreen</button>
-    <button id="fullBtn">Fullscreen</button>
-  </div>
   <div class="container">
     <canvas id="canvas"></canvas>
     <img src="human.png" class="human-overlay" alt="Human silhouette overlay">
   </div>
+  <div class="controls">
+    <button id="aspectRatio16x9" class="aspect-ratio-button active">16:9</button>
+    <button id="aspectRatio4x3" class="aspect-ratio-button">4:3</button>
+    <button id="aspectRatio1x1" class="aspect-ratio-button">1:1</button>
+    <button id="fullscreenButton">Fullscreen</button>
+  </div>
   <script type="module" src="sky.js"></script>
+  <script type="module" src="controls.js"></script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4c6229722a6346bc8eb5cb0e5eae5d41","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 </body>
 </html>
