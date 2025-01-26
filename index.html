@@ -1,6 +1,6 @@
 <html>
 <head>
-  <title>3D Infinite Sky Shader with Silhouette</title>
+  <title>3D Infinite Sky Shader with Body Tracking</title>
   <style>
     body {
       margin: 0;
@@ -23,11 +23,41 @@
       mix-blend-mode: multiply;
       opacity: 0.95;
     }
+    #webcam-container {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 240px;
+      height: 180px;
+      border-radius: 8px;
+      overflow: hidden;
+      z-index: 2;
+      background: rgba(0,0,0,0.5);
+    }
+    #webcam {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    #pose-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
   </style>
 </head>
 <body>
   <canvas id="canvas"></canvas>
   <img src="human.png" class="human-overlay" alt="Human silhouette overlay">
+  <div id="webcam-container">
+    <video id="webcam" playsinline></video>
+    <canvas id="pose-canvas"></canvas>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.11.0/dist/tf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/pose-detection@0.0.6/dist/pose-detection.min.js"></script>
+  <script type="module" src="tracking.js"></script>
   <script type="module" src="sky.js"></script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4c6229722a6346bc8eb5cb0e5eae5d41","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 </body>
