@@ -6,7 +6,8 @@ const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerH
 const renderer = new THREE.WebGLRenderer({
   canvas: document.querySelector('#canvas'),
   antialias: true,
-  powerPreference: "high-performance"
+  powerPreference: "high-performance",
+  alpha: true
 });
 
 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -95,22 +96,28 @@ camera.position.z = 1;
 
 // Handle window resize
 const onResize = () => {
-  camera.aspect = window.innerWidth / window.innerHeight;
+  const width = window.innerWidth;
+  const height = window.innerHeight;
+  
+  camera.aspect = width / height;
   camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  material.uniforms.resolution.value.set(window.innerWidth, window.innerHeight);
+  renderer.setSize(width, height);
+  material.uniforms.resolution.value.set(width, height);
+  
+  // Update overlay size
+  const overlay = document.getElementById('overlay');
+  overlay.style.width = `${width}px`;
+  overlay.style.height = `${height}px`;
 };
 
 window.addEventListener('resize', onResize);
+onResize(); // Initial size setup
 
 // Animation loop
-let lastTime = 0;
 function animate(currentTime) {
   material.uniforms.time.value = currentTime * 0.001;
   renderer.render(scene, camera);
   requestAnimationFrame(animate);
 }
 
-// Initialize resolution uniform and start animation
-material.uniforms.resolution.value.set(window.innerWidth, window.innerHeight);
 animate(0);
