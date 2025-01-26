@@ -90,30 +90,6 @@ const material = new THREE.ShaderMaterial(skyShader);
 const quad = new THREE.Mesh(geometry, material);
 scene.add(quad);
 
-// Create pose visualization mesh
-const poseGeometry = new THREE.BufferGeometry();
-const poseVertices = new Float32Array(33 * 3); // 33 keypoints * 3 coordinates
-const poseMaterial = new THREE.PointsMaterial({
-  color: 0x00ffff,
-  size: 0.1,  // Increased point size
-  sizeAttenuation: false // Keep point size constant regardless of distance
-});
-const posePoints = new THREE.Points(poseGeometry, poseMaterial);
-posePoints.position.z = 0.1; // Move slightly in front of sky
-scene.add(posePoints);
-
-// Create lines for skeleton
-const skeletonGeometry = new THREE.BufferGeometry();
-const skeletonMaterial = new THREE.LineBasicMaterial({
-  color: 0x00ffff,
-  linewidth: 3,
-  transparent: true,
-  opacity: 0.8
-});
-const skeletonLines = new THREE.LineSegments(skeletonGeometry, skeletonMaterial);
-skeletonLines.position.z = 0.1; // Move slightly in front of sky
-scene.add(skeletonLines);
-
 // Position camera
 camera.position.z = 1;
 
@@ -126,50 +102,6 @@ const onResize = () => {
 };
 
 window.addEventListener('resize', onResize);
-
-// Update pose visualization in the scene
-window.addEventListener('poseUpdated', (event) => {
-  const pose = event.detail;
-  
-  // Update keypoints
-  const vertices = [];
-  pose.keypoints.forEach(keypoint => {
-    if (keypoint.score > 0.3) {
-      // Convert from screen coordinates to scene coordinates
-      // Flip Y coordinates since webcam is mirrored
-      const x = -(keypoint.x / window.innerWidth) * 2 + 1;
-      const y = -(keypoint.y / window.innerHeight) * 2 + 1;
-      vertices.push(x, y, 0);
-    } else {
-      // Add invisible point if confidence is low
-      vertices.push(0, 0, -1000);
-    }
-  });
-  
-  poseGeometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
-  
-  // Update skeleton
-  const connections = poseDetection.util.getAdjacentPairs(poseDetection.SupportedModels.MoveNet);
-  const skeletonVertices = [];
-  
-  connections.forEach(([i, j]) => {
-    const kp1 = pose.keypoints[i];
-    const kp2 = pose.keypoints[j];
-    
-    if (kp1.score > 0.3 && kp2.score > 0.3) {
-      // Flip X coordinates since webcam is mirrored
-      const x1 = -(kp1.x / window.innerWidth) * 2 + 1;
-      const y1 = -(kp1.y / window.innerHeight) * 2 + 1;
-      const x2 = -(kp2.x / window.innerWidth) * 2 + 1;
-      const y2 = -(kp2.y / window.innerHeight) * 2 + 1;
-      
-      skeletonVertices.push(x1, y1, 0);
-      skeletonVertices.push(x2, y2, 0);
-    }
-  });
-  
-  skeletonGeometry.setAttribute('position', new THREE.Float32BufferAttribute(skeletonVertices, 3));
-});
 
 // Animation loop
 let lastTime = 0;

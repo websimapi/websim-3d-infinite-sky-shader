@@ -23,46 +23,37 @@
       mix-blend-mode: multiply;
       opacity: 0.95;
     }
-    #webcam-container {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      width: 320px;  
-      height: 240px;
-      border-radius: 12px;
-      overflow: hidden;
-      z-index: 2;
-      background: rgba(0,0,0,0.5);
-      border: 2px solid rgba(0,255,255,0.5);
-      box-shadow: 0 0 20px rgba(0,0,0,0.5);
-    }
     #webcam {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      transform: scaleX(-1); 
-    }
-    #pose-canvas {
-      position: absolute;
+      position: fixed;
       top: 0;
       left: 0;
-      width: 100%;
-      height: 100%;
-      transform: scaleX(-1); 
+      opacity: 0;
+      pointer-events: none;
+    }
+    #pose-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 2;
     }
   </style>
 </head>
 <body>
   <canvas id="canvas"></canvas>
   <img src="human.png" class="human-overlay" alt="Human silhouette overlay">
-  <div id="webcam-container">
-    <video id="webcam" playsinline></video>
-    <canvas id="pose-canvas"></canvas>
-  </div>
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.11.0/dist/tf.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/pose-detection@2.0.0/dist/pose-detection.min.js"></script>
-  <script type="module" src="tracking.js"></script>
+  <video id="webcam" playsinline></video>
+  <canvas id="pose-canvas"></canvas>
+  
+  <!-- Load TF.js and body tracking -->
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-core"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-webgl"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/pose-detection"></script>
+  
   <script type="module" src="sky.js"></script>
+  <script type="module" src="bodyTracker.js"></script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4c6229722a6346bc8eb5cb0e5eae5d41","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 </body>
 </html>
