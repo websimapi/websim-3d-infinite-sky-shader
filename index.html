@@ -41,8 +41,6 @@
       bottom: 20px;
       right: 20px;
       z-index: 2;
-      display: flex;
-      gap: 10px;
     }
     button {
       background: rgba(255, 255, 255, 0.2);
@@ -57,9 +55,6 @@
     button:hover {
       background: rgba(255, 255, 255, 0.3);
     }
-    .aspect-ratio-button.active {
-      background: rgba(255, 255, 255, 0.4);
-    }
   </style>
 </head>
 <body>
@@ -68,9 +63,6 @@
     <img src="human.png" class="human-overlay" alt="Human silhouette overlay">
   </div>
   <div class="controls">
-    <button id="aspectRatio16x9" class="aspect-ratio-button active">16:9</button>
-    <button id="aspectRatio4x3" class="aspect-ratio-button">4:3</button>
-    <button id="aspectRatio1x1" class="aspect-ratio-button">1:1</button>
     <button id="fullscreenButton">Fullscreen</button>
   </div>
   <script type="module" src="sky.js"></script>
