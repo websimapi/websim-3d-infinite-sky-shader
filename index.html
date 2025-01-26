@@ -13,13 +13,13 @@
     }
     .human-overlay {
       position: fixed;
-      top: 50vh; /* Changed from 0 to 50vh to move it down by half the viewport height */
-      left: 0;
-      width: 100vw;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) translateY(50vh);
       height: 100vh;
+      width: auto;
       z-index: 1;
       pointer-events: none;
-      object-fit: cover;
       mix-blend-mode: multiply;
       opacity: 0.95;
     }
