@@ -5,11 +5,12 @@ const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 const renderer = new THREE.WebGLRenderer({
   canvas: document.querySelector('#canvas'),
-  antialias: true
+  antialias: true,
+  powerPreference: "high-performance"
 });
 
 renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setPixelRatio(window.devicePixelRatio);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Limit pixel ratio for better performance
 
 // Create sky shader material
 const skyShader = {
@@ -31,20 +32,24 @@ const skyShader = {
 
     #define PI 3.14159265359
     
+    // Optimized noise function
+    float hash(float n) {
+      return fract(sin(n) * 43758.5453123);
+    }
+
     float noise(vec3 p) {
       vec3 i = floor(p);
       vec3 f = fract(p);
       f = f * f * (3.0 - 2.0 * f);
       
-      float n = i.x + i.y * 157.0 + 113.0 * i.z;
-      return mix(mix(mix(fract(sin(n + 0.0) * 43758.5453123),
-                       fract(sin(n + 1.0) * 43758.5453123), f.x),
-                   mix(fract(sin(n + 157.0) * 43758.5453123),
-                       fract(sin(n + 158.0) * 43758.5453123), f.x), f.y),
-               mix(mix(fract(sin(n + 113.0) * 43758.5453123),
-                       fract(sin(n + 114.0) * 43758.5453123), f.x),
-                   mix(fract(sin(n + 270.0) * 43758.5453123),
-                       fract(sin(n + 271.0) * 43758.5453123), f.x), f.y), f.z);
+      float n = dot(i, vec3(1.0, 157.0, 113.0));
+      vec4 h = vec4(0.0, 1.0, 157.0, 158.0);
+      vec4 g = vec4(hash(n + dot(h, vec4(0.0, 1.0, 1.0, 1.0))));
+      
+      return mix(mix(mix(g.x, g.y, f.x),
+                    mix(g.z, g.w, f.x), f.y),
+                mix(mix(g.x, g.y, f.x),
+                    mix(g.z, g.w, f.x), f.y), f.z);
     }
 
     void main() {
@@ -52,30 +57,30 @@ const skyShader = {
       uv.x *= resolution.x / resolution.y;
       
       vec3 dir = normalize(vec3(uv, 1.0));
-      float t = time * 0.2;
+      float t = time * 0.15; // Slowed down time factor
       
       // Sky colors
       vec3 sky = vec3(0.1, 0.3, 0.6);
       vec3 cloud = vec3(1.0);
       
-      // Cloud layers
-      float n = 0.0;
-      float scale = 1.0;
+      // Optimized cloud layers
       float density = 0.0;
+      float scale = 1.0;
       
-      for(int i = 0; i < 5; i++) {
-        float level = noise(dir * scale + vec3(t * (0.5 + float(i) * 0.1), t, 0.0));
-        density += level / scale;
+      // Reduced number of iterations for better performance
+      for(int i = 0; i < 4; i++) {
+        float level = noise(dir * scale + vec3(t * (0.5 + float(i) * 0.05), t, 0.0));
+        density += level / (scale * 1.5);
         scale *= 2.0;
       }
       
-      // Mix sky and clouds
-      vec3 color = mix(sky, cloud, smoothstep(0.5, 1.0, density));
+      // Mix sky and clouds with smoother transition
+      vec3 color = mix(sky, cloud, smoothstep(0.4, 0.8, density));
       
-      // Add sun
+      // Add sun with softer glow
       vec3 sunDir = normalize(vec3(sin(t), 0.2, cos(t)));
       float sunIntensity = max(0.0, dot(dir, sunDir));
-      color += vec3(1.0, 0.7, 0.3) * pow(sunIntensity, 32.0);
+      color += vec3(1.0, 0.7, 0.3) * pow(sunIntensity, 16.0) * 0.8;
       
       gl_FragColor = vec4(color, 1.0);
     }
@@ -92,16 +97,24 @@ scene.add(quad);
 camera.position.z = 1;
 
 // Handle window resize
-window.addEventListener('resize', () => {
+const onResize = () => {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
   material.uniforms.resolution.value.set(window.innerWidth, window.innerHeight);
-});
+};
 
-// Animation loop
-function animate(time) {
-  material.uniforms.time.value = time * 0.001;
+window.addEventListener('resize', onResize);
+
+// Animation loop with time smoothing
+let lastTime = 0;
+function animate(currentTime) {
+  const deltaTime = currentTime - lastTime;
+  lastTime = currentTime;
+  
+  // Smooth time updates
+  material.uniforms.time.value = currentTime * 0.001;
+  
   renderer.render(scene, camera);
   requestAnimationFrame(animate);
 }
