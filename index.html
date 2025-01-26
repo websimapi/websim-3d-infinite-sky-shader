@@ -1,59 +1,50 @@
 <html>
 <head>
-  <title>3D Infinite Sky Shader with Body Tracking</title>
+  <title>3D Infinite Sky Shader with Silhouette</title>
   <style>
     body {
       margin: 0;
       overflow: hidden;
-    }
-    canvas {
+      display: flex;
+      justify-content: center;
+      align-items: center;
       width: 100vw;
       height: 100vh;
+      background: black;
+    }
+    .container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      max-width: 100vh;
+      max-height: 100vw;
+      aspect-ratio: 1/1;
+    }
+    canvas {
+      width: 100%;
+      height: 100%;
       display: block;
     }
     .human-overlay {
-      position: fixed;
+      position: absolute;
       top: 50%;
       left: 50%;
-      transform: translate(-50%, -50%) translateY(50vh) scale(2.66);
-      height: 100vh;
+      transform: translate(-50%, -50%) translateY(50%) scale(2.66);
+      height: 100%;
       width: auto;
       z-index: 1;
       pointer-events: none;
       mix-blend-mode: multiply;
       opacity: 0.95;
     }
-    #webcam {
-      position: fixed;
-      top: 0;
-      left: 0;
-      opacity: 0;
-      pointer-events: none;
-    }
-    #pose-canvas {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      pointer-events: none;
-      z-index: 2;
-    }
   </style>
 </head>
 <body>
-  <canvas id="canvas"></canvas>
-  <img src="human.png" class="human-overlay" alt="Human silhouette overlay">
-  <video id="webcam" playsinline></video>
-  <canvas id="pose-canvas"></canvas>
-  
-  <!-- Load TF.js and body tracking -->
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-core"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-webgl"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/pose-detection"></script>
-  
+  <div class="container">
+    <canvas id="canvas"></canvas>
+    <img src="human.png" class="human-overlay" alt="Human silhouette overlay">
+  </div>
   <script type="module" src="sky.js"></script>
-  <script type="module" src="bodyTracker.js"></script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4c6229722a6346bc8eb5cb0e5eae5d41","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 </body>
 </html>

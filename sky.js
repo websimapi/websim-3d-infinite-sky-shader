@@ -2,14 +2,22 @@ import * as THREE from 'https://cdn.skypack.dev/three@0.132.2';
 
 // Initialize scene, camera and renderer
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
+const container = document.querySelector('.container');
 const renderer = new THREE.WebGLRenderer({
   canvas: document.querySelector('#canvas'),
   antialias: true,
   powerPreference: "high-performance"
 });
 
-renderer.setSize(window.innerWidth, window.innerHeight);
+function getSize() {
+  const width = container.clientWidth;
+  const height = container.clientHeight;
+  return { width, height };
+}
+
+const size = getSize();
+renderer.setSize(size.width, size.height);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
 // Create sky shader material
@@ -95,10 +103,9 @@ camera.position.z = 1;
 
 // Handle window resize
 const onResize = () => {
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  material.uniforms.resolution.value.set(window.innerWidth, window.innerHeight);
+  const size = getSize();
+  renderer.setSize(size.width, size.height);
+  material.uniforms.resolution.value.set(size.width, size.height);
 };
 
 window.addEventListener('resize', onResize);
@@ -112,5 +119,6 @@ function animate(currentTime) {
 }
 
 // Initialize resolution uniform and start animation
-material.uniforms.resolution.value.set(window.innerWidth, window.innerHeight);
+const initialSize = getSize();
+material.uniforms.resolution.value.set(initialSize.width, initialSize.height);
 animate(0);
