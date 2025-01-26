@@ -15,19 +15,19 @@
     }
     .container {
       position: relative;
-      width: 100%;
-      height: 100%;
-      max-width: 100vh;
-      max-height: 100vw;
+      width: min(100%, 100vh);
+      height: min(100%, 100vw);
       aspect-ratio: 1/1;
       transition: all 0.3s ease;
     }
     .container.widescreen {
+      width: min(100%, 177.78vh); /* 16:9 ratio */
+      height: min(100%, 56.25vw); /* 16:9 ratio */
       aspect-ratio: 16/9;
     }
     .container.fullscreen {
-      max-width: 100vw;
-      max-height: 100vh;
+      width: 100vw;
+      height: 100vh;
       aspect-ratio: unset;
     }
     canvas {
