@@ -130,9 +130,13 @@ window.addEventListener('poseUpdated', (event) => {
   const vertices = [];
   pose.keypoints.forEach(keypoint => {
     if (keypoint.score > 0.3) {
-      // Convert from screen coordinates to scene coordinates
+      // Convert from screen coordinates to scaled overlay coordinates
+      // Account for the 2.66 scale and 50vh downward translation from CSS
+      const screenY = keypoint.y / window.innerHeight;
+      const adjustedY = (screenY - 0.5) * 2.66 + 0.5; // Scale and center
+      
       const x = (keypoint.x / window.innerWidth) * 2 - 1;
-      const y = -(keypoint.y / window.innerHeight) * 2 + 1;
+      const y = -(adjustedY) * 2 + 1;
       vertices.push(x, y, 0);
     }
   });
@@ -148,10 +152,16 @@ window.addEventListener('poseUpdated', (event) => {
     const kp2 = pose.keypoints[j];
     
     if (kp1.score > 0.3 && kp2.score > 0.3) {
+      const screenY1 = kp1.y / window.innerHeight;
+      const adjustedY1 = (screenY1 - 0.5) * 2.66 + 0.5;
+      
+      const screenY2 = kp2.y / window.innerHeight;
+      const adjustedY2 = (screenY2 - 0.5) * 2.66 + 0.5;
+      
       const x1 = (kp1.x / window.innerWidth) * 2 - 1;
-      const y1 = -(kp1.y / window.innerHeight) * 2 + 1;
+      const y1 = -(adjustedY1) * 2 + 1;
       const x2 = (kp2.x / window.innerWidth) * 2 - 1;
-      const y2 = -(kp2.y / window.innerHeight) * 2 + 1;
+      const y2 = -(adjustedY2) * 2 + 1;
       
       skeletonVertices.push(x1, y1, 0);
       skeletonVertices.push(x2, y2, 0);
