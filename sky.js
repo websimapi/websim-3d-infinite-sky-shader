@@ -10,6 +10,38 @@ const renderer = new THREE.WebGLRenderer({
   powerPreference: "high-performance"
 });
 
+// View mode controls
+const squareBtn = document.getElementById('squareBtn');
+const wideBtn = document.getElementById('wideBtn');
+const fullBtn = document.getElementById('fullBtn');
+
+function setActiveButton(activeBtn) {
+  [squareBtn, wideBtn, fullBtn].forEach(btn => {
+    btn.classList.remove('active');
+  });
+  activeBtn.classList.add('active');
+}
+
+squareBtn.addEventListener('click', () => {
+  container.classList.remove('widescreen', 'fullscreen');
+  setActiveButton(squareBtn);
+  onResize();
+});
+
+wideBtn.addEventListener('click', () => {
+  container.classList.remove('fullscreen');
+  container.classList.add('widescreen');
+  setActiveButton(wideBtn);
+  onResize();
+});
+
+fullBtn.addEventListener('click', () => {
+  container.classList.remove('widescreen');
+  container.classList.add('fullscreen');
+  setActiveButton(fullBtn);
+  onResize();
+});
+
 function getSize() {
   const width = container.clientWidth;
   const height = container.clientHeight;
@@ -106,6 +138,8 @@ const onResize = () => {
   const size = getSize();
   renderer.setSize(size.width, size.height);
   material.uniforms.resolution.value.set(size.width, size.height);
+  camera.aspect = size.width / size.height;
+  camera.updateProjectionMatrix();
 };
 
 window.addEventListener('resize', onResize);
